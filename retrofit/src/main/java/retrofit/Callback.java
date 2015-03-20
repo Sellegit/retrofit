@@ -15,7 +15,9 @@
  */
 package retrofit;
 
-import com.squareup.okhttp.Response;
+//import com.squareup.okhttp.Response;
+
+import retrofit.sharehttp.Response;
 
 /**
  * Communicates responses from a server or offline requests. One and only one method will be

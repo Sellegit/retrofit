@@ -15,10 +15,13 @@
  */
 package retrofit.converter;
 
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.ResponseBody;
+//import com.squareup.okhttp.RequestBody;
+//import com.squareup.okhttp.ResponseBody;
 import java.io.IOException;
 import java.lang.reflect.Type;
+
+import retrofit.sharehttp.RequestBody;
+import retrofit.sharehttp.ResponseBody;
 
 /**
  * Arbiter for converting objects to and from their representation in HTTP.

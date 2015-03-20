@@ -15,23 +15,29 @@
  */
 package retrofit;
 
-import com.squareup.okhttp.Headers;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
+//import com.squareup.okhttp.Headers;
+//import com.squareup.okhttp.MediaType;
+//import com.squareup.okhttp.Request;
+//import com.squareup.okhttp.RequestBody;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.net.URLEncoder;
 import java.util.Map;
+//import okio.BufferedSink;
 import okio.BufferedSink;
+import okio.Sink;
 import retrofit.converter.Converter;
 import retrofit.http.Body;
 import retrofit.http.Header;
 import retrofit.http.Path;
 import retrofit.http.Query;
 import retrofit.http.QueryMap;
+import retrofit.sharehttp.Headers;
+import retrofit.sharehttp.MediaType;
+import retrofit.sharehttp.Request;
+import retrofit.sharehttp.RequestBody;
 
 final class RequestBuilder implements RequestInterceptor.RequestFacade {
   private static final Headers NO_HEADERS = Headers.of();

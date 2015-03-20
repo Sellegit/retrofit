@@ -15,11 +15,13 @@
  */
 package retrofit;
 
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.ResponseBody;
+//import com.squareup.okhttp.Response;
+//import com.squareup.okhttp.ResponseBody;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import retrofit.converter.Converter;
+import retrofit.sharehttp.Response;
+import retrofit.sharehttp.ResponseBody;
 
 public class RetrofitError extends RuntimeException {
   public static RetrofitError networkFailure(String url, IOException exception) {

@@ -16,14 +16,20 @@
  */
 package retrofit;
 
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.ResponseBody;
+//import com.squareup.okhttp.MediaType;
+//import com.squareup.okhttp.Response;
+//import com.squareup.okhttp.ResponseBody;
 import java.io.IOException;
 import java.util.concurrent.Executor;
+
 import okio.Buffer;
-import okio.BufferedSource;
 import okio.Source;
+import retrofit.sharehttp.MediaType;
+import retrofit.sharehttp.Response;
+import retrofit.sharehttp.ResponseBody;
+//import okio.Buffer;
+//import okio.BufferedSource;
+//import okio.Source;
 
 final class Utils {
   static <T> T checkNotNull(T object, String message, Object... args) {
@@ -43,7 +49,7 @@ final class Utils {
       return response;
     }
 
-    BufferedSource source = body.source();
+    Source source = body.source();
     final Buffer buffer = new Buffer();
     buffer.writeAll(source);
     source.close();
@@ -58,7 +64,7 @@ final class Utils {
             return buffer.size();
           }
 
-          @Override public BufferedSource source() {
+          @Override public Source source() {
             return buffer.clone();
           }
         })

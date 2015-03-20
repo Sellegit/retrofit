@@ -15,7 +15,7 @@
  */
 package retrofit;
 
-import com.squareup.okhttp.Response;
+//import com.squareup.okhttp.Response;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -46,13 +46,14 @@ import retrofit.http.Query;
 import retrofit.http.QueryMap;
 import retrofit.http.HTTP;
 import retrofit.http.Streaming;
-import rx.Observable;
+import retrofit.sharehttp.Response;
+//import rx.Observable;
 
 /** Request metadata about a service interface declaration. */
 final class MethodInfo {
   enum ExecutionType {
     ASYNC,
-    RX,
+//    RX,
     SYNC
   }
 
@@ -82,7 +83,7 @@ final class MethodInfo {
   String requestUrl;
   Set<String> requestUrlParamNames;
   String requestQuery;
-  com.squareup.okhttp.Headers headers;
+  retrofit.sharehttp.Headers headers;
   String contentTypeHeader;
   boolean isStreaming;
 
@@ -206,8 +207,8 @@ final class MethodInfo {
     requestQuery = query;
   }
 
-  com.squareup.okhttp.Headers parseHeaders(String[] headers) {
-    com.squareup.okhttp.Headers.Builder builder = new com.squareup.okhttp.Headers.Builder();
+  retrofit.sharehttp.Headers parseHeaders(String[] headers) {
+    retrofit.sharehttp.Headers.Builder builder = new retrofit.sharehttp.Headers.Builder();
     for (String header : headers) {
       int colon = header.indexOf(':');
       if (colon == -1 || colon == 0 || colon == header.length() - 1) {
@@ -258,14 +259,14 @@ final class MethodInfo {
     }
 
     if (hasReturnType) {
-      if (Platform.HAS_RX_JAVA) {
-        Class rawReturnType = Types.getRawType(returnType);
-        if (RxSupport.isObservable(rawReturnType)) {
-          returnType = RxSupport.getObservableType(returnType, rawReturnType);
-          responseObjectType = getParameterUpperBound((ParameterizedType) returnType);
-          return ExecutionType.RX;
-        }
-      }
+//      if (Platform.HAS_RX_JAVA) {
+//        Class rawReturnType = Types.getRawType(returnType);
+//        if (RxSupport.isObservable(rawReturnType)) {
+//          returnType = RxSupport.getObservableType(returnType, rawReturnType);
+//          responseObjectType = getParameterUpperBound((ParameterizedType) returnType);
+//          return ExecutionType.RX;
+//        }
+//      }
       responseObjectType = returnType;
       return ExecutionType.SYNC;
     }
@@ -426,14 +427,14 @@ final class MethodInfo {
     return patterns;
   }
 
-  /** Indirection to avoid log complaints if RxJava isn't present. */
-  private static final class RxSupport {
-    public static boolean isObservable(Class rawType) {
-      return rawType == Observable.class;
-    }
-
-    public static Type getObservableType(Type contextType, Class contextRawType) {
-      return Types.getSupertype(contextType, contextRawType, Observable.class);
-    }
-  }
+//  /** Indirection to avoid log complaints if RxJava isn't present. */
+//  private static final class RxSupport {
+//    public static boolean isObservable(Class rawType) {
+//      return rawType == Observable.class;
+//    }
+//
+//    public static Type getObservableType(Type contextType, Class contextRawType) {
+//      return Types.getSupertype(contextType, contextRawType, Observable.class);
+//    }
+//  }
 }

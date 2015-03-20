@@ -15,11 +15,11 @@
  */
 package retrofit;
 
-import com.squareup.okhttp.Call;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.ResponseBody;
+//import com.squareup.okhttp.Call;
+//import com.squareup.okhttp.OkHttpClient;
+//import com.squareup.okhttp.Request;
+//import com.squareup.okhttp.Response;
+//import com.squareup.okhttp.ResponseBody;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -31,6 +31,11 @@ import java.util.concurrent.Executor;
 import retrofit.converter.Converter;
 import retrofit.http.HTTP;
 import retrofit.http.Header;
+import retrofit.sharehttp.Request;
+import retrofit.sharehttp.Response;
+import retrofit.sharehttp.ResponseBody;
+import retrofit.sharehttp.ResponseCallback;
+import retrofit.sharehttp.ShareHttpClient;
 
 /**
  * Adapts a Java interface to a REST API.
@@ -107,10 +112,10 @@ public class RestAdapter {
   final Converter converter;
   final ErrorHandler errorHandler;
 
-  private final OkHttpClient client;
-  private RxSupport rxSupport;
+  private final ShareHttpClient client;
+//  private RxSupport rxSupport;
 
-  private RestAdapter(Endpoint endpoint, OkHttpClient client, Executor callbackExecutor,
+  private RestAdapter(Endpoint endpoint, ShareHttpClient client, Executor callbackExecutor,
       RequestInterceptor requestInterceptor, Converter converter, ErrorHandler errorHandler) {
     this.endpoint = endpoint;
     this.client = client;
@@ -173,8 +178,8 @@ public class RestAdapter {
         case ASYNC:
           invokeAsync(methodInfo, request, (Callback) args[args.length - 1]);
           return null; // Async has void return type.
-        case RX:
-          return invokeRx(methodInfo, request);
+//        case RX:
+//          return invokeRx(methodInfo, request);
         default:
           throw new IllegalStateException("Unknown response type: " + methodInfo.executionType);
       }
@@ -182,7 +187,7 @@ public class RestAdapter {
 
     private Object invokeSync(MethodInfo methodInfo, Request request) throws Throwable {
       try {
-        Response response = client.newCall(request).execute();
+        Response response = client.executeSync(request);
         return createResult(methodInfo, response);
       } catch (IOException e) {
         throw handleError(RetrofitError.networkFailure(request.urlString(), e));
@@ -202,52 +207,53 @@ public class RestAdapter {
 
     private void invokeAsync(final MethodInfo methodInfo, final Request request,
         final Callback callback) {
-      Call call = client.newCall(request);
-      call.enqueue(new com.squareup.okhttp.Callback() {
-        @Override public void onFailure(Request request, IOException e) {
-          callFailure(callback, RetrofitError.networkFailure(request.urlString(), e));
-        }
+      client.executeAsync(request, new ResponseCallback() {
+          @Override
+          public void onFailure(Request request, IOException e) {
+              callFailure(callback, RetrofitError.networkFailure(request.urlString(), e));
+          }
 
-        @Override public void onResponse(Response response) {
+          @Override
+          public void onResponse(Response response) {
           try {
             Object result = createResult(methodInfo, response);
             callResponse(callback, result, response);
           } catch (RetrofitError error) {
             callFailure(callback, error);
           }
-        }
+          }
       });
     }
 
-    private Object invokeRx(final MethodInfo methodInfo, final Request request) {
-      if (rxSupport == null) {
-        if (Platform.HAS_RX_JAVA) {
-          rxSupport = new RxSupport();
-        } else {
-          throw new IllegalStateException("Found Observable return type but RxJava not present.");
-        }
-      }
-      return rxSupport.createRequestObservable(new RxSupport.Invoker() {
-        @Override public void invoke(final Callback callback) {
-          Call call = client.newCall(request);
-          call.enqueue(new com.squareup.okhttp.Callback() {
-            @Override public void onFailure(Request request, IOException e) {
-              callback.next(RetrofitError.networkFailure(request.urlString(), e));
-            }
-
-            @Override public void onResponse(Response response) {
-              try {
-                Object result = createResult(methodInfo, response);
-                callback.next(result);
-              } catch (RetrofitError error) {
-                callback.error(handleError(error));
-              }
-            }
-          });
-
-        }
-      });
-    }
+//    private Object invokeRx(final MethodInfo methodInfo, final Request request) {
+//      if (rxSupport == null) {
+//        if (Platform.HAS_RX_JAVA) {
+//          rxSupport = new RxSupport();
+//        } else {
+//          throw new IllegalStateException("Found Observable return type but RxJava not present.");
+//        }
+//      }
+//      return rxSupport.createRequestObservable(new RxSupport.Invoker() {
+//        @Override public void invoke(final Callback callback) {
+//          Call call = client.newCall(request);
+//          call.enqueue(new com.squareup.okhttp.Callback() {
+//            @Override public void onFailure(Request request, IOException e) {
+//              callback.next(RetrofitError.networkFailure(request.urlString(), e));
+//            }
+//
+//            @Override public void onResponse(Response response) {
+//              try {
+//                Object result = createResult(methodInfo, response);
+//                callback.next(result);
+//              } catch (RetrofitError error) {
+//                callback.error(handleError(error));
+//              }
+//            }
+//          });
+//
+//        }
+//      });
+//    }
 
     /**
      * Create the object to return to the caller for a response.
@@ -355,7 +361,7 @@ public class RestAdapter {
    */
   public static class Builder {
     private Endpoint endpoint;
-    private OkHttpClient client;
+    private ShareHttpClient client;
     private Executor callbackExecutor;
     private RequestInterceptor requestInterceptor;
     private Converter converter;
@@ -376,7 +382,7 @@ public class RestAdapter {
     }
 
     /** The HTTP client used for requests. */
-    public Builder setClient(OkHttpClient client) {
+    public Builder setClient(ShareHttpClient client) {
       if (client == null) {
         throw new NullPointerException("Client may not be null.");
       }
