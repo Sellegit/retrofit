@@ -3,6 +3,7 @@ package retrofit;
 import java.io.IOException;
 
 import okio.Buffer;
+import okio.BufferedSource;
 import okio.ForwardingSource;
 import okio.Okio;
 import okio.Source;
@@ -21,11 +22,11 @@ class ExceptionCatchingRequestBody extends ResponseBody {
     return delegate.contentType();
   }
 
-  @Override public long contentLength() {
+  @Override public long contentLength() throws IOException {
     return delegate.contentLength();
   }
 
-  @Override public Source source() {
+  @Override public BufferedSource source() throws IOException {
     return Okio.buffer(new ForwardingSource(delegate.source()) {
         @Override
         public long read(Buffer sink, long byteCount) throws IOException {

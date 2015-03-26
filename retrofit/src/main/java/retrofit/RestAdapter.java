@@ -443,13 +443,13 @@ public class RestAdapter {
 
     private void ensureSaneDefaults() {
       if (converter == null) {
-        converter = Platform.get().defaultConverter();
+        converter = Platform.getPlatform().defaultConverter();
       }
       if (client == null) {
-        client = Platform.get().defaultClient();
+        client = Platform.getPlatform().defaultClient();
       }
       if (callbackExecutor == null) {
-        callbackExecutor = Platform.get().defaultCallbackExecutor();
+        callbackExecutor = Platform.getPlatform().defaultCallbackExecutor();
       }
       if (errorHandler == null) {
         errorHandler = ErrorHandler.DEFAULT;

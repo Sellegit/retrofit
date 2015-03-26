@@ -25,42 +25,31 @@ import retrofit.converter.Converter;
 //import retrofit.converter.GsonConverter;
 import retrofit.sharehttp.ShareHttpClient;
 
-class Platform {
-  private static final Platform PLATFORM = findPlatform();
+public abstract class Platform {
 
-//  static final boolean HAS_RX_JAVA = hasRxJavaOnClasspath();
+    private static Platform sPlatform;
 
-  static Platform get() {
-    return PLATFORM;
-  }
+    public static void setPlatform(Platform platform) {
+        sPlatform = platform;
+    }
 
-  private static Platform findPlatform() {
-//    try {
-//      Class.forName("android.os.Build");
-//      if (Build.VERSION.SDK_INT != 0) {
-//        return new Android();
-//      }
-//    } catch (ClassNotFoundException ignored) {
-//    }
+    public static Platform getPlatform() {
+        return sPlatform;
+    }
 
-    return new Platform();
-  }
+    public abstract Converter defaultConverter();
 
-  Converter defaultConverter() {
-    return null;//new GsonConverter();
-  }
+    public Executor defaultCallbackExecutor() {
+        return new Utils.SynchronousExecutor();
+    }
 
-  Executor defaultCallbackExecutor() {
-    return new Utils.SynchronousExecutor();
-  }
-
-  ShareHttpClient defaultClient() {
-    ShareHttpClient client = ShareHttpClient.newInstance();
-    client.setConnectTimeout(15, TimeUnit.SECONDS);
-    client.setReadTimeout(15, TimeUnit.SECONDS);
-    client.setWriteTimeout(15, TimeUnit.SECONDS);
-    return client;
-  }
+    public ShareHttpClient defaultClient() {
+        ShareHttpClient client = ShareHttpClient.newInstance();
+        client.setConnectTimeout(15, TimeUnit.SECONDS);
+        client.setReadTimeout(15, TimeUnit.SECONDS);
+        client.setWriteTimeout(15, TimeUnit.SECONDS);
+        return client;
+    }
 
   /** Provides sane defaults for operation on Android. */
 //  private static class Android extends Platform {

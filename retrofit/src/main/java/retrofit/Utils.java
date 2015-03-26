@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.concurrent.Executor;
 
 import okio.Buffer;
+import okio.BufferedSource;
 import okio.Source;
 import retrofit.sharehttp.MediaType;
 import retrofit.sharehttp.Response;
@@ -64,7 +65,7 @@ final class Utils {
             return buffer.size();
           }
 
-          @Override public Source source() {
+          @Override public BufferedSource source() {
             return buffer.clone();
           }
         })
