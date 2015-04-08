@@ -36,6 +36,8 @@ public interface Converter {
    */
   Object fromBody(ResponseBody body, Type type) throws IOException;
 
+  Object fromString(String body, Type type) throws IOException;
+
   /**
    * Convert an object to an appropriate representation for HTTP transport.
    *
@@ -43,4 +45,6 @@ public interface Converter {
    * @return Representation of the specified object as bytes.
    */
   RequestBody toBody(Object object, Type type);
+
+  String toString(Object object, Type type);
 }

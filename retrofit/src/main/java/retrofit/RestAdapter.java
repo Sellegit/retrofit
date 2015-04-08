@@ -125,7 +125,11 @@ public class RestAdapter {
     this.errorHandler = errorHandler;
   }
 
-  /** Create an implementation of the API defined by the specified {@code service} interface. */
+  public Converter getConverter() {
+    return converter;
+  }
+
+    /** Create an implementation of the API defined by the specified {@code service} interface. */
   @SuppressWarnings("unchecked")
   public <T> T create(Class<T> service) {
     Utils.validateServiceClass(service);
