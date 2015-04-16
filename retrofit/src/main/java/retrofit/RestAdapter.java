@@ -321,11 +321,13 @@ public class RestAdapter {
 
     private void callResponse(final Callback callback, final Object result,
         final Response response) {
-      callbackExecutor.execute(new Runnable() {
-        @Override public void run() {
-          callback.success(result, response);
+        if (callback != null) {
+            callbackExecutor.execute(new Runnable() {
+                @Override public void run() {
+                    callback.success(result, response);
+                }
+            });
         }
-      });
     }
 
     private void callFailure(final Callback callback, RetrofitError error) {
