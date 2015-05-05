@@ -1,6 +1,7 @@
 package retrofit.sharehttp;
 
 import java.io.IOException;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -32,7 +33,37 @@ public abstract class ShareHttpClient {
 
     public abstract void setWriteTimeout(long timeout, TimeUnit unit);
 
-    public abstract Response executeSync(Request request) throws IOException;
+    private static class Out<T> {
+        T obj;
+    }
+
+    public Response executeSync(Request request) throws IOException {
+        final Semaphore waitSem = new Semaphore(0);
+        final Out<Response> responseWrapper = new Out<>();
+        final Out<IOException> exWrapper = new Out<>();
+        executeAsync(request, new ResponseCallback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                exWrapper.obj = e;
+                waitSem.release();
+            }
+
+            @Override
+            public void onResponse(Response response) {
+                responseWrapper.obj = response;
+                waitSem.release();
+            }
+        });
+        try {
+            waitSem.acquire();
+        } catch (InterruptedException e) {
+            throw new IOException(e);
+        }
+        if (exWrapper.obj != null) {
+            throw exWrapper.obj;
+        }
+        return responseWrapper.obj;
+    }
 
     public abstract void executeAsync(Request request, ResponseCallback callback);
 }
