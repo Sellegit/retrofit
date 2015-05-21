@@ -273,19 +273,21 @@ final class MethodInfo {
 
     lastArgType = Types.getSupertype(lastArgType, Types.getRawType(lastArgType), Callback.class);
     if (lastArgType instanceof ParameterizedType) {
-      responseObjectType = getParameterUpperBound((ParameterizedType) lastArgType);
+      responseObjectType = getParameterLowerBound((ParameterizedType) lastArgType);
       return ExecutionType.ASYNC;
     }
 
     throw methodError("Last parameter must be of type Callback<X> or Callback<? super X>.");
   }
 
-  private static Type getParameterUpperBound(ParameterizedType type) {
+  // note since we only support ? super X, we actually wants to get the lower bound for o.w.
+  //   we risk feeding a object more general than the callback expects
+  private static Type getParameterLowerBound(ParameterizedType type) {
     Type[] types = type.getActualTypeArguments();
     for (int i = 0; i < types.length; i++) {
       Type paramType = types[i];
       if (paramType instanceof WildcardType) {
-        types[i] = ((WildcardType) paramType).getUpperBounds()[0];
+        types[i] = ((WildcardType) paramType).getLowerBounds()[0];
       }
     }
     return types[0];
